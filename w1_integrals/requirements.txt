@@ -1,1 +1,1 @@
-FiniteConsole==1.1
+FiniteConsole==0.0.1
