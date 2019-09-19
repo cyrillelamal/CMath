@@ -1,98 +1,114 @@
 import math
+from functools import wraps
 
-from decorators import with_steps, with_print
 
+# USER'S DEFINITIONS
 
-PRECISION = 10**(-5)
-
-NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
-
-BASE_NUMBER_OF_STEPS = 10  # Variable
-
+# Edges
 A = 0
 B = 1
 
 
+# Integrated function
 def func(x):
-    """Integrated function"""
     return math.sin(x)  # 0.45970
 
 
+# Constant steps
+NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
+
+# Variable steps
+VAR_NUMBER_OF_STEPS = 50
+PRECISION = 10**(-5)
+
+
+# END OF USER"S DEFINITIONS
+
+# Deep dark backends
+def printable(gen):
+    """Print result returned by the function"""
+    @wraps(gen)
+    def new_func(*args, **kwargs):
+        for i, n in gen(*args, **kwargs):
+            print(f'For {n}: {i:.5f}')
+    return new_func
+
+
+def step_generator():
+    """Yield step lengths"""
+    for n in NUMBER_OF_STEPS:
+        yield (B - A) / n
+
+
+# Generators for sums
 def left_rectangles_generator(h):
-    x = A
-    while x < B:
+    x = A  # From 0
+    while x <= B - h:  # To n-1
         yield func(x)
         x += h
 
 
 def right_rectangles_generator(h):
-    x = A + h
-    while x <= B:
+    x = A + h  # From 1
+    while x <= B:  # To n
         yield func(x)
         x += h
 
 
 def trapezium_generator(h):
-    x = A + h
-    while x < B - h:
+    x = A + h  # From 1
+    while x <= B - h:  # To n-1
         yield func(x)
         x += h
 
 
-@with_steps(NUMBER_OF_STEPS)
-@with_print
-def left_rectangles(n):
-    h = (B - A) / n  # h
-    i = h * sum(left_rectangles_generator(h))
-    return i, n
+# 'View' functions
+@printable
+def left_rectangles():
+    for n, h in zip(NUMBER_OF_STEPS, step_generator()):
+        i = h * sum(left_rectangles_generator(h))
+        yield i, h
 
 
-@with_steps(NUMBER_OF_STEPS)
-@with_print
-def right_rectangles(n):
-    h = (B - A) / n  # h
-    i = h * sum(right_rectangles_generator(h))
-    return i, n
+@printable
+def right_rectangles():
+    for n, h in zip(NUMBER_OF_STEPS, step_generator()):
+        i = h * sum(right_rectangles_generator(h))
+        yield i, n
 
 
-@with_steps(NUMBER_OF_STEPS)
-@with_print
-def trapezium(n):
-    h = (B - A) / n  # h
-    i = h * ((func(A) + func(B)) / 2 + sum(trapezium_generator(h)))
-    return i, n
+@printable
+def trapezium():
+    for n, h in zip(NUMBER_OF_STEPS, step_generator()):
+        i = h * ((func(A) + func(B)) / 2 + sum(trapezium_generator(h)))
+        yield i, n
 
 
-@with_steps(NUMBER_OF_STEPS)
-@with_print
-def parable(n):  # Simpson
-    if n % 2 == 1:
-        raise ValueError('Number of steps must be even')
-    sum_ = func(A) + func(B)
-    h = (B - A) / (2*n)
+@printable
+def parable():  # Simpson
+    for n, h in zip(NUMBER_OF_STEPS, step_generator()):
+        if n % 2 == 1:
+            raise ValueError('Number of steps must be even')
 
-    odd_sum = 0
-    for i in range(1, n):
-        odd_sum += func(2*h*i + A)
-    sum_ += 2*odd_sum
+        h /= 2
 
-    even_sum = 0
-    for i in range(1, n+1):
-        even_sum += func(h*(-1+2*i)+A)
-    sum_ += 4*even_sum
-    sum_ *= (h/3)
-    return sum_, n
+        odd_sum = 0
+        for i in range(1, n):
+            odd_sum += func(2 * h * i + A)
+        even_sum = 0
+        for i in range(1, n + 1):
+            even_sum += func(h * (-1 + 2 * i) + A)
+
+        i = h/3 * (func(A) + func(B) + 2*odd_sum + 4*even_sum)
+        yield i, n
 
 
-@with_print
+@printable
 def alg1():
     """Count at every step until the precision is attempted"""
-    base_h = (B - A) / BASE_NUMBER_OF_STEPS
-    # A smaller integral in the integral
-    previous_sum = 0
-    h = base_h
+    h = (B - A) / VAR_NUMBER_OF_STEPS  # Base step
 
-    # Base small integral (do, while)
+    previous_sum = 0
     current_sum = h * sum(left_rectangles_generator(h))
 
     while abs(current_sum - previous_sum) > PRECISION:
@@ -102,7 +118,7 @@ def alg1():
 
         current_sum = h * sum(left_rectangles_generator(h))
 
-    return current_sum, h
+    yield current_sum, h
 
 
 def alg2():
