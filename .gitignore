@@ -1,5 +1,5 @@
 # Locally installed packages
-FiniteConsole*/
+labs/FiniteConsole/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

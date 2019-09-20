@@ -1,7 +1,8 @@
 import sys
 
-from FiniteConsole.FiniteConsole import Program, Menu, Option
-import funcs as f
+from FiniteConsole.FiniteConsole import Menu, Option, Program
+from lab1 import funcs as f
+
 
 p = Program()
 p.init_menu = Menu('main')
@@ -39,5 +40,5 @@ Menu('alg_1', f.alg1)
 Menu('alg_2', f.alg2)
 
 
-if __name__ == '__main__':
+def start():
     p.start_loop()

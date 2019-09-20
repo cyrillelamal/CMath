@@ -14,6 +14,9 @@ def func(x):
     return math.sin(x)  # 0.45970
 
 
+# Function maximum
+MAX = 1
+
 # Constant steps
 NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
 
@@ -106,19 +109,22 @@ def parable():  # Simpson
 @printable
 def alg1():
     """Count at every step until the precision is attempted"""
-    h = (B - A) / VAR_NUMBER_OF_STEPS  # Base step
+    h = math.sqrt(PRECISION)
+    n = int((B - A) / h)
+    r = (B - A)**3 / (12 * n**2) * MAX
+    print('Остаточный член: {:.10f}'.format(r))
 
     previous_sum = 0
-    current_sum = h * sum(left_rectangles_generator(h))
+    current_sum = h * sum(trapezium_generator(h))
 
     while abs(current_sum - previous_sum) > PRECISION:
         # Integrate with a new step
         previous_sum = current_sum
         h /= 2
 
-        current_sum = h * sum(left_rectangles_generator(h))
+        current_sum = h * sum(trapezium_generator(h))
 
-    yield current_sum, h
+    yield current_sum, n
 
 
 def alg2():
