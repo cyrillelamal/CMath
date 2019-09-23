@@ -5,17 +5,17 @@ from functools import wraps
 # USER'S DEFINITIONS
 
 # Edges
-A = 0
-B = 1
+A = 1
+B = 4
 
 
 # Integrated function
 def func(x):
-    return math.sin(x)  # 0.45970
+    return 2*x + 3/math.sqrt(x)  # 21
 
 
 # Function maximum
-MAX = 1
+MAX = math.inf
 
 # Constant steps
 NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
@@ -111,7 +111,7 @@ def alg1():
     """Count at every step until the precision is attempted"""
     h = math.sqrt(PRECISION)
     n = int((B - A) / h)
-    r = (B - A)**3 / (12 * n**2) * MAX
+    r = abs((B - A)**3 / (12 * n**2) * MAX)
     print('Остаточный член: {:.10f}'.format(r))
 
     previous_sum = 0

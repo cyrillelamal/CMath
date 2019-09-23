@@ -194,7 +194,7 @@ class Menu:
 
         inp = None
         while inp not in self.options:
-            inp = input('Choose an option: ')
+            inp = input('Пункт меню: ')
         return inp
 
     def append_options(self, *options):
