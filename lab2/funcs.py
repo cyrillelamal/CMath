@@ -17,40 +17,33 @@ def derived(x):
 
 def newton():
     prev_x = START_X
-    f = func(prev_x)
-    d = derived(prev_x)
-    cur_x = prev_x - f / d
-    while abs(prev_x - cur_x) > PRECISION:
+    cur_x = prev_x - func(prev_x) / derived(prev_x)
+    while abs(prev_x - cur_x) >= PRECISION:
         prev_x = cur_x
-        f = func(prev_x)
-        d = derived(prev_x)
-        cur_x = prev_x - f / d
+        cur_x = prev_x - func(prev_x) / derived(prev_x)
     print(f'Newton: {cur_x}')
 
 
 def chord():
-    pass
+    prev_x = A
+    cur_x = B
+
+    while abs(cur_x - prev_x) >= PRECISION:
+        x = cur_x - ((cur_x - prev_x)*func(cur_x)) / (func(cur_x) - func(prev_x))
+        prev_x = cur_x
+        cur_x = x
+    print(f'Chord: {cur_x}')
 
 
 def dichotomy():
-    a = A
-    b = B
-    x = (a + b) / 2
-    fa = func(A)  # Left
-    fx = func(x)  # Center
-    while abs(b - a) > PRECISION:
-        if (fa < 0 and fx < 0) or (fa > 0 and fx > 0):
-            # Not changed
-            # Move left to the center
-            a = x
-        else:
-            # Changed
-            # Move right to the center
-            b = x
-        x = x = (a + b) / 2
-        fa = func(a)
-        fx = func(x)
-    print(x)
+    left = A
+    right = B
+    x = START_X
+
+    while abs(left - right) >= PRECISION:
+        x = (left + right) / 2
+        left, right = (left, x) if func(x) > 0 else (x, right)
+    print(f'Dichotomy: {x}')
 
 
 dichotomy()
