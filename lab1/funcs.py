@@ -132,7 +132,8 @@ def alg1():
 
 
 def alg2():
-    hv = (B - A) / NUMBER_OF_STEPS[0]  # Base step
+    n_init = NUMBER_OF_STEPS[0]
+    hv = (B - A) / n_init  # Base step
     previous_integral = hv * sum(left_rectangles_generator(hv))
 
     hs = hv / 2  # Bias step
@@ -140,8 +141,10 @@ def alg2():
     start_from = A + hs  # Bias from x0
     current_integral = hv * sum(left_rectangles_generator(hd, start_from))
     hv = hs  # new hv
+    n = n_init * 2
 
     while abs(current_integral - previous_integral) >= E:
+        n *= 2
         previous_integral = current_integral
         hs = hv / 2  # Bias step
         hd = hv  # New step for sum: previous hv
@@ -149,4 +152,6 @@ def alg2():
         current_integral = hv * sum(left_rectangles_generator(hd, start_from))
         hv = hs  # new hv
 
+    print(f'Начальное количество шагов: {n_init}. '
+          f'Финальное количество шагов: {n}')
     print(f'Результат: {round(current_integral, PRECISION)}')
