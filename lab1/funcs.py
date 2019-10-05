@@ -20,8 +20,6 @@ MAX = math.inf
 # Constant steps
 NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
 
-# Variable steps
-VAR_NUMBER_OF_STEPS = 50
 PRECISION = 10**(-5)
 
 
@@ -58,8 +56,11 @@ def right_rectangles_generator(h):
         x += h
 
 
-def trapezium_generator(h):
-    x = A + h  # From 1
+def trapezium_generator(h, start_from=None):
+    if start_from is None:
+        x = A + h  # From x0
+    else:
+        x = start_from  # From x1
     while x <= B - h:  # To n-1
         yield func(x)
         x += h
@@ -114,18 +115,27 @@ def alg1():
     r = abs((B - A)**3 / (12 * n**2) * MAX)
     print('Остаточный член: {:.10f}'.format(r))
 
-    previous_sum = 0
-    current_sum = h * sum(trapezium_generator(h))
+    previous_integral = 0
+    current_integral = h * sum(trapezium_generator(h))
 
-    while abs(current_sum - previous_sum) > PRECISION:
+    while abs(current_integral - previous_integral) > PRECISION:
         # Integrate with a new step
-        previous_sum = current_sum
+        previous_integral = current_integral
         h /= 2
 
-        current_sum = h * sum(trapezium_generator(h))
+        current_integral = h * sum(trapezium_generator(h))
 
-    yield current_sum, n
+    yield current_integral, n
 
 
 def alg2():
-    print('will be soon 2')
+    h = (B - A) / NUMBER_OF_STEPS[0]  # Base step (hv)
+    previous_integral = h * sum(trapezium_generator(h))
+
+    hs = h / 2  # Bias step (hs)
+    hd = h
+    current_integral = hd * sum(trapezium_generator(hd, ))
+
+
+
+alg2()
