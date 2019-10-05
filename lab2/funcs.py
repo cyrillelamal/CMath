@@ -27,7 +27,6 @@ def newton():
 def chord():
     prev_x = A
     cur_x = B
-
     while abs(cur_x - prev_x) >= PRECISION:
         x = cur_x - ((cur_x - prev_x)*func(cur_x)) / (func(cur_x) - func(prev_x))
         prev_x = cur_x

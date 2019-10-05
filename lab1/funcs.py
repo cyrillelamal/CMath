@@ -20,7 +20,8 @@ MAX = math.inf
 # Constant steps
 NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
 
-PRECISION = 10**(-5)
+E = 10**(-5)
+PRECISION = 5
 
 
 # END OF USER"S DEFINITIONS
@@ -31,7 +32,7 @@ def printable(gen):
     @wraps(gen)
     def new_func(*args, **kwargs):
         for i, n in gen(*args, **kwargs):
-            print(f'For {n}: {i:.5f}')
+            print(f'Для {n}: {i:.5f}')
     return new_func
 
 
@@ -42,8 +43,9 @@ def step_generator():
 
 
 # Generators for sums
-def left_rectangles_generator(h):
-    x = A  # From 0
+def left_rectangles_generator(h, start_from=None):
+    x = A if start_from is None else start_from
+    # x = A  # From 0
     while x <= B - h:  # To n-1
         yield func(x)
         x += h
@@ -56,11 +58,8 @@ def right_rectangles_generator(h):
         x += h
 
 
-def trapezium_generator(h, start_from=None):
-    if start_from is None:
-        x = A + h  # From x0
-    else:
-        x = start_from  # From x1
+def trapezium_generator(h):
+    x = A + h  # From x0
     while x <= B - h:  # To n-1
         yield func(x)
         x += h
@@ -107,35 +106,47 @@ def parable():  # Simpson
         yield i, n
 
 
-@printable
 def alg1():
     """Count at every step until the precision is attempted"""
-    h = math.sqrt(PRECISION)
-    n = int((B - A) / h)
-    r = abs((B - A)**3 / (12 * n**2) * MAX)
-    print('Остаточный член: {:.10f}'.format(r))
+    h = math.sqrt(E)
+    n_init = int((B - A) / h)
+    r = abs((B - A)**3 / (12 * n_init**2) * MAX)
+    print('Остаточный член: {:.5f}'.format(r))
 
-    previous_integral = 0
+    current_integral = h * sum(trapezium_generator(h))
+    previous_integral = current_integral
+    h /= 2
+    n = n_init * 2
     current_integral = h * sum(trapezium_generator(h))
 
-    while abs(current_integral - previous_integral) > PRECISION:
+    while abs(current_integral - previous_integral) >= E:
         # Integrate with a new step
         previous_integral = current_integral
         h /= 2
-
+        n *= 2
         current_integral = h * sum(trapezium_generator(h))
 
-    yield current_integral, n
+    print(f'Начальное количество шагов: {n_init}. '
+          f'Финальное количество шагов: {n}')
+    print(f'Результат: {round(current_integral, PRECISION)}')
 
 
 def alg2():
-    h = (B - A) / NUMBER_OF_STEPS[0]  # Base step (hv)
-    previous_integral = h * sum(trapezium_generator(h))
+    hv = (B - A) / NUMBER_OF_STEPS[0]  # Base step
+    previous_integral = hv * sum(left_rectangles_generator(hv))
 
-    hs = h / 2  # Bias step (hs)
-    hd = h
-    current_integral = hd * sum(trapezium_generator(hd, ))
+    hs = hv / 2  # Bias step
+    hd = hv  # New step for sum: previous hv
+    start_from = A + hs  # Bias from x0
+    current_integral = hv * sum(left_rectangles_generator(hd, start_from))
+    hv = hs  # new hv
 
+    while abs(current_integral - previous_integral) >= E:
+        previous_integral = current_integral
+        hs = hv / 2  # Bias step
+        hd = hv  # New step for sum: previous hv
+        start_from = A + hs
+        current_integral = hv * sum(left_rectangles_generator(hd, start_from))
+        hv = hs  # new hv
 
-
-alg2()
+    print(f'Результат: {round(current_integral, PRECISION)}')
