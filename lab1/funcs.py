@@ -1,5 +1,4 @@
 import math
-from functools import wraps
 
 
 # USER'S DEFINITIONS
@@ -27,21 +26,6 @@ PRECISION = 5
 # END OF USER"S DEFINITIONS
 
 # Deep dark backends
-def printable(gen):
-    """Print result returned by the function"""
-    @wraps(gen)
-    def new_func(*args, **kwargs):
-        for i, n in gen(*args, **kwargs):
-            print(f'Для {n}: {i:.5f}')
-    return new_func
-
-
-def step_generator():
-    """Yield step lengths"""
-    for n in NUMBER_OF_STEPS:
-        yield (B - A) / n
-
-
 # Generators for sums
 def left_rectangles_generator(h, start_from=None):
     x = A if start_from is None else start_from
@@ -66,34 +50,35 @@ def trapezium_generator(h):
 
 
 # 'View' functions
-@printable
 def left_rectangles():
-    for n, h in zip(NUMBER_OF_STEPS, step_generator()):
-        i = h * sum(left_rectangles_generator(h))
-        yield i, h
+    for n in NUMBER_OF_STEPS:
+        h = (B - A) / n
+        i = round(h * sum(left_rectangles_generator(h)), PRECISION)
+        print(f'Для {n} шагов: {i}')
 
 
-@printable
 def right_rectangles():
-    for n, h in zip(NUMBER_OF_STEPS, step_generator()):
-        i = h * sum(right_rectangles_generator(h))
-        yield i, n
+    for n in NUMBER_OF_STEPS:
+        h = (B - A) / n
+        i = round(h * sum(right_rectangles_generator(h)), PRECISION)
+        print(f'Для {n} шагов: {i}')
 
 
-@printable
 def trapezium():
-    for n, h in zip(NUMBER_OF_STEPS, step_generator()):
-        i = h * ((func(A) + func(B)) / 2 + sum(trapezium_generator(h)))
-        yield i, n
+    for n in NUMBER_OF_STEPS:
+        h = (B - A) / n
+        i = round(
+            h * ((func(A) + func(B)) / 2 + sum(trapezium_generator(h))),
+            PRECISION
+        )
+        print(f'Для {n} шагов: {i}')
 
 
-@printable
 def parable():  # Simpson
-    for n, h in zip(NUMBER_OF_STEPS, step_generator()):
+    for n in NUMBER_OF_STEPS:
         if n % 2 == 1:
             raise ValueError('Number of steps must be even')
-
-        h /= 2
+        h = (B - A) / n / 2
 
         odd_sum = 0
         for i in range(1, n):
@@ -102,12 +87,15 @@ def parable():  # Simpson
         for i in range(1, n + 1):
             even_sum += func(h * (-1 + 2 * i) + A)
 
-        i = h/3 * (func(A) + func(B) + 2*odd_sum + 4*even_sum)
-        yield i, n
+        i = round(
+            h/3 * (func(A) + func(B) + 2*odd_sum + 4*even_sum),
+            PRECISION
+        )
+        print(f'Для {n} шагов: {i}')
 
 
 def alg1():
-    """Count at every step until the precision is attempted"""
+    """Recount every integral"""
     h = math.sqrt(E)
     n_init = int((B - A) / h)
     r = abs((B - A)**3 / (12 * n_init**2) * MAX)
