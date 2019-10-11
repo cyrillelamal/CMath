@@ -35,14 +35,15 @@ def chord():
 
 
 def dichotomy():
+    """Half divide method"""
     left = A
     right = B
-    x = START_X
+    x = (left + right) / 2
+
+    if func(A) * func(B) > 0:
+        raise ValueError('The sign must be different')
 
     while abs(left - right) >= PRECISION:
+        left, right = (left, x) if func(x) * func(x) < 0 else (x, right)
         x = (left + right) / 2
-        left, right = (left, x) if func(x) > 0 else (x, right)
     print(f'Dichotomy: {x}')
-
-
-dichotomy()

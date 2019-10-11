@@ -26,7 +26,8 @@ def double_func(x, y):
 MAX = 19 / 2
 
 # Constant steps
-X_NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
+NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
+X_NUMBER_OF_STEPS = 10**4
 Y_NUMBER_OF_STEPS = 10**3
 
 E = 10**(-5)
@@ -39,7 +40,6 @@ PRECISION = 5
 # Generators for sums
 def left_rectangles_generator(h, start_from=None):
     x = A if start_from is None else start_from
-    # x = A  # From 0
     while x <= B - h:  # To n-1
         yield func(x)
         x += h
@@ -61,21 +61,21 @@ def trapezium_generator(h):
 
 # 'View' functions
 def left_rectangles():
-    for n in X_NUMBER_OF_STEPS:
+    for n in NUMBER_OF_STEPS:
         h = (B - A) / n
         i = round(h * sum(left_rectangles_generator(h)), PRECISION)
         print(f'Для {n} шагов: {i}')
 
 
 def right_rectangles():
-    for n in X_NUMBER_OF_STEPS:
+    for n in NUMBER_OF_STEPS:
         h = (B - A) / n
         i = round(h * sum(right_rectangles_generator(h)), PRECISION)
         print(f'Для {n} шагов: {i}')
 
 
 def trapezium():
-    for n in X_NUMBER_OF_STEPS:
+    for n in NUMBER_OF_STEPS:
         h = (B - A) / n
         i = round(
             h * ((func(A) + func(B)) / 2 + sum(trapezium_generator(h))),
@@ -85,7 +85,7 @@ def trapezium():
 
 
 def parable():  # Simpson
-    for n in X_NUMBER_OF_STEPS:
+    for n in NUMBER_OF_STEPS:
         if n % 2 == 1:
             raise ValueError('Number of steps must be even')
         h = (B - A) / n / 2
@@ -130,7 +130,8 @@ def alg1():
 
 
 def alg2():
-    n_init = X_NUMBER_OF_STEPS[0]  # 100
+    h = math.sqrt(E)
+    n_init = int((B - A) / h)
     r = abs((B - A)**3 / (12 * n_init**2) * MAX)
     print('Остаточный член: {:.5f}'.format(r))
 
@@ -160,12 +161,12 @@ def alg2():
 
 def double_int():
     """Count multiple integral"""
-    nx = X_NUMBER_OF_STEPS[0]
+    nx = X_NUMBER_OF_STEPS
     ny = Y_NUMBER_OF_STEPS
-    hx = (B2 - A2) / nx
-    hy = (D2 - C2) / ny
-    print(f'Количество шагов по x: {nx}, hx={hx}.\n'
-          f'Количество шагов по y: {ny}, hy={hy}.')
+    hx = round((B2 - A2) / nx, PRECISION)
+    hy = round((D2 - C2) / ny, PRECISION)
+    print(f'Количество шагов по x={nx}, hx={hx}.\n'
+          f'Количество шагов по y={ny}, hy={hy}.')
     sx = 0  # Sum for x
     x = A2
     while x <= B2 - hx:
