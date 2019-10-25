@@ -1,5 +1,3 @@
-import sys
-
 from FiniteConsole.FiniteConsole import Program, Option, Menu
 from lab2 import funcs as f
 
@@ -16,7 +14,7 @@ p.init_menu.append_options(
 Menu('newton', f.newton)
 Menu('chord', f.chord)
 Menu('dichotomy', f.dichotomy)
-Menu('exit', lambda: sys.exit())
+Menu('exit', lambda: exit())
 
 
 def start():
