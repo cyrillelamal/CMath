@@ -33,7 +33,7 @@ def rk():
         y = Y0
         print(f'Шаг интегрирования: {h}')
         print(f'x0={x:.5f}; y0={y:.5f}')
-        for i in range(n):
+        for _ in range(n):
             k1 = h * func(x, y)
             k2 = h * func(x+h/2, y+k1/2)
             k3 = h * func(x+h/2, y+k2/2)
