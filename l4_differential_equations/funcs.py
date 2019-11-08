@@ -6,42 +6,49 @@ B = 1
 X0 = A
 Y0 = 1
 
-NUM_OF_SEP = [10, 50, 150]
-
-
-def f(x, y):
-    return y * (1 - x)
+NUM_OF_STEP = [10, 50, 150]
 
 
 def euler():
-    for n in NUM_OF_SEP:
-        h = (B - A) / n
-        x = X0  # x0
-        y = Y0  # y0
+    def f(x, y):
+        return y * (1 - x)
+
+    a = 0
+    b = 1
+
+    for n in NUM_OF_STEP:
+        h = (b - a) / n
+        xi = a  # [0; 1]
+        yi = 1  # y(0)=1
         print(f'Шаг интегрирования: {h}')
-        print(f'x0={x:.5f}; y0={y:.5f}')
+        print(f'x0={xi:.5f}; y0={yi:.5f}')
         for _ in range(n):
-            y += h * f(x, y)
-            x += h
-            print(f'{x:.5f}; {y:.5f}')
+            yi += h * f(xi, yi)
+            xi += h
+            print(f'x={xi:.5f}; y={yi:.5f}')
 
 
-def rk(a=A, b=B, x=X0, y=Y0, h=None, func=f):
-    for n in NUM_OF_SEP:
-        if h is None:
-            h = (b - a) / n
+def rk():
+    def f(x, y):
+        return y * (1 - x)
 
+    a = 0
+    b = 1
+
+    for n in NUM_OF_STEP:
+        h = (b - a) / n
+        xi = a
+        yi = 1
         print(f'Шаг интегрирования: {h}')
-        print(f'x0={x:.5f}; y0={y:.5f}')
+        print(f'x0={xi:.5f}; y0={yi:.5f}')
         for _ in range(n):
-            k1 = h * func(x, y)
-            k2 = h * func(x+h/2, y+k1/2)
-            k3 = h * func(x+h/2, y+k2/2)
-            k4 = h * func(x+h, y+k3)
-            y += ((k1 + 2*k2 + 2*k3 + k4) / 6)
-            x += h
-            print(f'{x:.5f}; {y:.5f}')
-        return x, y
+            k1 = h * f(xi, yi)
+            k2 = h * f(xi+h/2, yi+k1/2)
+            k3 = h * f(xi+h/2, yi+k2/2)
+            k4 = h * f(xi+h, yi+k3)
+            yi += ((k1 + 2*k2 + 2*k3 + k4) / 6)
+            xi += h
+            print(f'x={xi:.5f}; y={yi:.5f}')
 
 
 def double():
@@ -55,13 +62,13 @@ def double():
 
     xi = 1
     yi = 0.77
-    z = -0.44  # y'
-    print(f'x0={round(xi, 5)}; y0={round(yi, 5)}')
+    zi = -0.44  # y'
+    print(f'x0={round(xi, 5)}; y0={round(yi, 5)}; z0={round(zi, 5)}')
     while xi <= 1.5:
-        yi = y1(yi, z)
-        z = z1(xi, yi, z)
+        zi = z1(xi, yi, zi)
+        yi = y1(yi, zi)
         xi += h
-        print(f'x={round(xi, 5)}; y={round(yi, 5)}; z={round(z, 5)}')
+        print(f'x={round(xi, 5)}; y={round(yi, 5)}; z={round(zi, 5)}')
 
 
 def system():
@@ -77,5 +84,3 @@ def system():
     xi = 2
     yi = 1
     zi = 1
-
-
