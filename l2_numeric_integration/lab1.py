@@ -1,7 +1,7 @@
 import sys
 
 from FiniteConsole.FiniteConsole import Menu, Option, Program
-from lab1 import funcs as f
+from l2_numeric_integration import funcs as f
 
 
 p = Program()  # Program object

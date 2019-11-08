@@ -1,4 +1,4 @@
-from lab2.lab2 import start
+from l2_numeric_integration.lab1 import start
 
 
 start()
