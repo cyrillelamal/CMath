@@ -81,6 +81,24 @@ def system():
     def dz_dt(x, z):
         return -x + 2*z
 
+    h = 0.001
+    end = 0.3
+
+    ti = 0
     xi = 2
     yi = 1
     zi = 1
+
+    print(f'x0={xi}, y0={yi}, z0={zi}, t0={ti}')
+
+    while ti < end:
+        yi += h * dy_dt(ti, xi, yi, zi)
+
+        tmp = xi  # Текущий x
+
+        xi += h * dx_dy(xi, zi)
+
+        zi += h * dz_dt(tmp, yi)  # Текущий x
+
+        print(f'x={xi}, y={yi}, z={zi}, t={ti}')
+        ti += h
