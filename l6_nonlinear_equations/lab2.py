@@ -1,5 +1,5 @@
 from FiniteConsole.FiniteConsole import Program, Option, Menu
-from l5_nonlinear_equations import funcs as f
+from l6_nonlinear_equations import funcs as f
 
 
 p = Program()

@@ -59,6 +59,11 @@ class Program:
         if not self._is_running:
             self._current_menu = menu
 
+    def get_menu_by_id(self, id_) -> 'Menu':
+        for menu_name, menu in self.menus.items():
+            if id_ == menu_name:
+                return menu
+
     # New menus will be appended automatically if the program exists
     def append_menus(self, *menus):
         for menu in menus:  # 'Menu'
