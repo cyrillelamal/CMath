@@ -1,7 +1,7 @@
 """
 Interface
 """
-from FiniteConsole.FiniteConsole import Program, Menu, Option
+from FiniteConsole import Program, Menu, Option
 from l5_elementary_functions import funcs as f
 
 

@@ -1,12 +1,12 @@
 import sys
 
-from FiniteConsole.FiniteConsole import Menu, Option, Program
+from FiniteConsole import Menu, Option, Program
 from l2_numeric_integration import funcs as f
 
 
-p = Program()  # Program object
+P = Program()  # Program object
 main = Menu('main')
-p.init_menu = main
+P.init_menu = main
 
 # Main 0
 main.append_options(
@@ -60,4 +60,4 @@ Menu('double_int', f.double_int)
 
 
 def start():
-    p.start_loop()
+    P.start_loop()

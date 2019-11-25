@@ -1,4 +1,4 @@
-from FiniteConsole.FiniteConsole import Program, Menu, Option
+from FiniteConsole import Program, Menu, Option
 from l4_differential_equations import funcs as f
 
 

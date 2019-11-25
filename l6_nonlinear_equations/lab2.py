@@ -1,4 +1,4 @@
-from FiniteConsole.FiniteConsole import Program, Option, Menu
+from FiniteConsole import Program, Option, Menu
 from l6_nonlinear_equations import funcs as f
 
 
