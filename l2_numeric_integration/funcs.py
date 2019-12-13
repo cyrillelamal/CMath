@@ -7,6 +7,7 @@ import math
 A = 1
 B = 4
 
+# Пределы интегрирования кратного интеграла
 A2 = 0
 B2 = math.pi/2
 C2 = 0
@@ -27,8 +28,6 @@ MAX = 19 / 2
 
 # Constant steps
 NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
-X_NUMBER_OF_STEPS = 10**4
-Y_NUMBER_OF_STEPS = 10**3
 
 E = 10**(-5)
 PRECISION = 5
@@ -161,10 +160,10 @@ def alg2():
 
 def double_int():
     """Count multiple integral"""
-    nx = X_NUMBER_OF_STEPS
-    ny = Y_NUMBER_OF_STEPS
-    hx = round((B2 - A2) / nx, PRECISION)
-    hy = round((D2 - C2) / ny, PRECISION)
+    nx = 10**3
+    ny = 10**3
+    hx = round((B2 - A2) / nx, 5)
+    hy = round((D2 - C2) / ny, 5)
     print(f'Количество шагов по x={nx}, hx={hx}.\n'
           f'Количество шагов по y={ny}, hy={hy}.')
     sx = 0  # Sum for x
@@ -178,5 +177,5 @@ def double_int():
         iy = hy * sy
         sx += iy
         x += hx
-    ix = round(hx * sx, PRECISION)
+    ix = round(hx * sx, 5)
     print(f'Двойной интеграл: {ix}')
