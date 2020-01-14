@@ -1,17 +1,10 @@
 import math
 
 
-# USER'S DEFINITIONS
+NUMBERS_OF_STEPS = [10**2, 10**3, 10**4]
 
-# Edges
-A = 1
-B = 4
-
-# Пределы интегрирования кратного интеграла
-A2 = 0
-B2 = math.pi/2
-C2 = 0
-D2 = math.pi/4
+P = 5  # Precision
+E = 10**(-P)  # Epsilon
 
 
 # Integrated function
@@ -19,159 +12,178 @@ def func(x):
     return 2*x + 3/math.sqrt(x)  # 21
 
 
+MAX = 19 / 2
+
+
 def double_func(x, y):
     return math.sin(x+y)
 
 
-# Function maximum
-MAX = 19 / 2
-
-# Constant steps
-NUMBER_OF_STEPS = [10**2, 10**3, 10**4]
-
-E = 10**(-5)
-PRECISION = 5
-
-
-# END OF USER"S DEFINITIONS
-
-# Deep dark backends
-# Generators for sums
-def left_rectangles_generator(h, start_from=None):
-    x = A if start_from is None else start_from
-    while x <= B - h:  # To n-1
+# Deep dark backend
+def trapezium_generator(a, b, h):
+    # [x0; n-1]  range
+    x = a + h
+    while x <= b - h:
         yield func(x)
         x += h
 
 
-def right_rectangles_generator(h):
-    x = A + h  # From 1
-    while x <= B:  # To n
-        yield func(x)
-        x += h
-
-
-def trapezium_generator(h):
-    x = A + h  # From x0
-    while x <= B - h:  # To n-1
-        yield func(x)
-        x += h
-
-
-# 'View' functions
 def left_rectangles():
-    for n in NUMBER_OF_STEPS:
-        h = (B - A) / n
-        i = round(h * sum(left_rectangles_generator(h)), PRECISION)
-        print(f'Для {n} шагов: {i}')
+    a = 1
+    b = 4
+    for n in NUMBERS_OF_STEPS:
+        s = 0
+        h = (b - a) / n
+        x = a
+        while x <= b - h:
+            s += round(func(x), P)
+            x += h
+        i = round(h * s, P)
+        print(f'{i} для {n} шагов.')
 
 
 def right_rectangles():
-    for n in NUMBER_OF_STEPS:
-        h = (B - A) / n
-        i = round(h * sum(right_rectangles_generator(h)), PRECISION)
-        print(f'Для {n} шагов: {i}')
+    a = 1
+    b = 4
+    for n in NUMBERS_OF_STEPS:
+        s = 0
+        h = (b - a) / n
+        x = a + h
+        while x <= b:
+            s += round(func(x), P)
+            x += h
+        i = round(h * s, P)
+        print(f'{i} для {n} шагов.')
 
 
 def trapezium():
-    for n in NUMBER_OF_STEPS:
-        h = (B - A) / n
-        i = round(
-            h * ((func(A) + func(B)) / 2 + sum(trapezium_generator(h))),
-            PRECISION
-        )
-        print(f'Для {n} шагов: {i}')
+    a = 1
+    b = 4
+    for n in NUMBERS_OF_STEPS:
+        s = 0
+        h = (b - a) / n
+        x = a + h
+        while x <= b - h:
+            s += round(func(x), P)
+            x += h
+        i = round(h * ((func(a) + func(b)) / 2 + s), P)
+        print(f'{i} для {n} шагов.')
 
 
 def parable():  # Simpson
-    for n in NUMBER_OF_STEPS:
+    a = 1
+    b = 4
+    for n in NUMBERS_OF_STEPS:
         if n % 2 == 1:
             raise ValueError('Number of steps must be even')
-        h = (B - A) / n / 2
-
+        h = (a + b) / n
+        h_inner = 2 * h
         odd_sum = 0
-        for i in range(1, n):
-            odd_sum += func(2 * h * i + A)
+        x = a + h
+        while x <= b - h:
+            odd_sum += round(func(x), P)
+            x += h_inner
         even_sum = 0
-        for i in range(1, n + 1):
-            even_sum += func(h * (-1 + 2 * i) + A)
-
-        i = round(
-            h/3 * (func(A) + func(B) + 2*odd_sum + 4*even_sum),
-            PRECISION
-        )
-        print(f'Для {n} шагов: {i}')
+        x = a + h_inner
+        while x <= b - h_inner:
+            even_sum += round(func(x), P)
+            x += h_inner
+        i = round((h/3) * (func(a) + func(b) + 4*odd_sum + 2*even_sum), P)
+        print(f'{i} для {n} шагов.')
 
 
 def alg1():
     """Recount every integral"""
+    a = 1
+    b = 4
+    # Остаточный член
     h = math.sqrt(E)
-    n_init = int((B - A) / h)
-    r = abs((B - A)**3 / (12 * n_init**2) * MAX)
-    print('Остаточный член: {:.5f}'.format(r))
+    n_init = int((b - a) / h)
+    r = round(abs((b - a)**3 / (12 * n_init**2) * MAX), P)
+    print(f'Остаточный член: {r}')
 
-    current_integral = h * sum(trapezium_generator(h))
-    previous_integral = current_integral
+    prev_integral = h * sum(trapezium_generator(a, b, h))
     h /= 2
-    n = n_init * 2
-    current_integral = h * sum(trapezium_generator(h))
+    n = 2 * n_init
+    curr_integral = h * sum(trapezium_generator(a, b, h))
 
-    while abs(current_integral - previous_integral) >= E:
+    while abs(curr_integral - prev_integral) >= E:
         # Integrate with a new step
-        previous_integral = current_integral
+        prev_integral = curr_integral
         h /= 2
         n *= 2
-        current_integral = h * sum(trapezium_generator(h))
+        curr_integral = h * sum(trapezium_generator(a, b, h))
 
-    print(f'Начальное количество шагов: {n_init}. '
-          f'Финальное количество шагов: {n}')
-    print(f'Результат: {round(current_integral, PRECISION)}')
+    print(
+        f'Начальное количество шагов: {n_init}.\n'
+        f'Финальное количество шагов: {n}.\n'
+        f'Результат: {round(curr_integral, P)}.'
+    )
 
 
 def alg2():
+    a = 1
+    b = 4
+    # Остаточный член
     h = math.sqrt(E)
-    n_init = int((B - A) / h)
-    r = abs((B - A)**3 / (12 * n_init**2) * MAX)
-    print('Остаточный член: {:.5f}'.format(r))
+    n_init = int((b - a) / h)
+    r = round(abs((b - a)**3 / (12 * n_init**2) * MAX), P)
+    print(f'Остаточный член: {r}')
 
-    hv = (B - A) / n_init  # Base step
-    previous_integral = hv * sum(left_rectangles_generator(hv))
+    # Trapezium's borders
+    t_borders = (func(a) + func(b)) / 2
+
+    hv = (b - a) / n_init  # Base step
+    prev_i = round(
+        hv * (t_borders + sum(trapezium_generator(a, b, hv))),
+        P
+    )
 
     hs = hv / 2  # Bias step
     hd = hv  # New step for sum: previous hv
-    start_from = A + hs  # Bias from x0
-    current_integral = hv * sum(left_rectangles_generator(hd, start_from))
+    curr_i = round(
+        hv * (t_borders + sum(trapezium_generator(a + hs, b, hd))),
+        P
+    )
     hv = hs  # new hv
     n = n_init * 2
 
-    while abs(current_integral - previous_integral) >= E:
+    while abs(curr_i - prev_i) >= E:
         n *= 2
-        previous_integral = current_integral
+        prev_i = curr_i
         hs = hv / 2  # Bias step
         hd = hv  # New step for sum: previous hv
-        start_from = A + hs
-        current_integral = hv * sum(left_rectangles_generator(hd, start_from))
+        curr_i = round(
+            hv * (t_borders + sum(trapezium_generator(a + hs, b, hd)))
+        )
         hv = hs  # new hv
 
-    print(f'Начальное количество шагов: {n_init}. '
-          f'Финальное количество шагов: {n}')
-    print(f'Результат: {round(current_integral, PRECISION)}')
+    print(
+        f'Начальное количество шагов: {n_init}.\n'
+        f'Финальное количество шагов: {n}.\n'
+        f'Результат: {round(curr_i, P)}.'
+    )
 
 
 def double_int():
     """Count multiple integral"""
+    # Пределы интегрирования кратного интеграла
+    a = 0
+    b = math.pi / 2
+    c = 0
+    d = math.pi / 4
     nx = 10**3
     ny = 10**3
-    hx = round((B2 - A2) / nx, 5)
-    hy = round((D2 - C2) / ny, 5)
+    hx = round((b - a) / nx, 5)
+    hy = round((d - c) / ny, 5)
     print(f'Количество шагов по x={nx}, hx={hx}.\n'
           f'Количество шагов по y={ny}, hy={hy}.')
     sx = 0  # Sum for x
-    x = A2
-    while x <= B2 - hx:
+    x = a
+    while x <= b - hx:
         sy = 0
-        y = C2
-        while y <= D2 - hy:
+        y = c
+        while y <= d - hy:
             sy += double_func(x, y)
             y += hy
         iy = hy * sy
